@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
-import joblib  # or import your ML framework
+import joblib
+from irrigation import predict_water_requirement
 
 app = Flask(__name__)
 
@@ -11,21 +12,17 @@ model = joblib.load('model.pkl')
 def home():
     return "ML Model API is running!"
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/predict_irrigation', methods=['POST'])
+def predict_irrigation():
     try:
-        # Expecting a JSON payload with an 'input' key.
+        # Expect JSON input containing the required keys
+        # Check irrigation.py for required keys
         data = request.get_json(force=True)
-        input_features = data.get('input')
-        if input_features is None:
-            return jsonify({'error': 'No input provided'}), 400
-
-        # Assuming the model expects a 2D array as input.
-        prediction = model.predict([input_features])
-        # Convert prediction to a list for JSON serialization.
-        return jsonify({'prediction': prediction.tolist()})
+        prediction = predict_water_requirement(data)
+        return jsonify({"predicted_water_requirement": prediction})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 400
+
 
 if __name__ == '__main__':
     # Run the Flask app on port 8080, which is the default for many cloud services.
