@@ -1,11 +1,16 @@
 buildscript {
+    ext {
+        kotlin_version = '1.9.0'
+    }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        // Use a version known to work with newer JDKs
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        // Use a compatible Android Gradle Plugin version.
+        // AGP 8.1.1 works with Gradle 8.3.
+        classpath 'com.android.tools.build:gradle:8.1.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -14,6 +19,16 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.ow2.asm' && details.requested.name.contains("asm-analysis")) {
+                details.useVersion '9.2' // Use a version that works for you.
+            }
+            if (details.requested.group == 'com.sun.xml.fastinfoset') {
+                details.useVersion '2.0.5' // Or another stable version.
+            }
+        }
     }
 }
 

@@ -6,23 +6,32 @@ import 'package:lencho/widgets/campaign/posting_widget.dart'; // This widget sho
 import 'package:lencho/widgets/home/header_widgets.dart';
 import 'package:lencho/widgets/home/content_widgets.dart';
 import 'package:lencho/controllers/home/authUser_controller.dart';
-import 'package:lencho/screens/community/community_browse_page.dart';
+import 'package:lencho/controllers/irrigation/weather_controller.dart';
 
 /// HomePage displays header, content, and conditionally an "Add" button for authorized users.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
+    final WeatherController weatherController = Get.put(WeatherController());
     final user = FirebaseAuth.instance.currentUser;
     final email = user?.email ?? "Guest";
-
+    
     // Initialize the AuthUserController.
     final AuthUserController authController = Get.put(AuthUserController());
-
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hello $email"),
+        // Use Obx to dynamically update the title based on weather data.
+        title: Obx(() {
+          if (weatherController.temperature.value == 0.0) {
+            return const Text('Loading weather...');
+          }
+          return Text(
+            'Weather in ${weatherController.locationName.value}: ${weatherController.temperature.value.toStringAsFixed(1)}°C',
+          );
+        }),
       ),
       body: Column(
         children: const [
@@ -51,25 +60,18 @@ class HomePage extends StatelessWidget {
             icon: Icon(Icons.chat),
             label: 'Chat',
           ),
-          if (isAuth)
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.people),
-              label: 'Communities',
-            ),
         ];
-
+        
         return BottomNavigationBar(
           items: items,
           onTap: (index) {
             if (isAuth) {
-              // When authorized: indices: 0:Home, 1:Add, 2:Search, 3:Chat, 4:Communities.
+              // When authorized: indices: 0:Home, 1:Add, 2:Search, 3:Chat.
               if (index == 1) {
                 // Navigate to campaign posting.
                 Get.to(() => CampaignPostingWidget());
               } else if (index == 3) {
                 Get.to(() => const ChatListPage());
-              } else if (index == 4) {
-                Get.to(() => const CommunityBrowsePage());
               }
             } else {
               // When not authorized: indices: 0:Home, 1:Search, 2:Chat.
