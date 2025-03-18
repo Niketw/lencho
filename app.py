@@ -4,10 +4,6 @@ from irrigation import predict_water_requirement
 
 app = Flask(__name__)
 
-# Load your ML model once when the application starts.
-# Replace 'model.pkl' with the path to your model.
-model = joblib.load('model.pkl')
-
 @app.route('/')
 def home():
     return "ML Model API is running!"
