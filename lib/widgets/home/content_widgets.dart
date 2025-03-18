@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lencho/widgets/home/section_widgets.dart';
 import 'package:lencho/widgets/campaign/campaign_widget.dart';
 import 'package:lencho/widgets/news/agri_news_widgets.dart';
+import 'package:lencho/screens/community/community_browse_page.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -18,7 +20,7 @@ class HomeContent extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, '/community');
+                  Get.to(() => const CommunityBrowsePage());
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -48,25 +50,27 @@ class HomeContent extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Dashboard Section
             ScrollableSection(
               title: 'DASHBOARD',
               items: [
                 SectionItem(
                   title: 'Disease Detection',
-                  onTap: () => Navigator.pushNamed(context, '/dashboard/disease'),
+                  onTap: () =>
+                      Navigator.pushNamed(context, '/dashboard/disease'),
                 ),
                 SectionItem(
                   title: 'Irrigation Plan',
-                  onTap: () => Navigator.pushNamed(context, '/dashboard/irrigation'),
+                  onTap: () =>
+                      Navigator.pushNamed(context, '/dashboard/irrigation'),
                 ),
               ],
             ),
-            
+
             // Dynamic Campaigns Section
             const CampaignsSection(),
-            
+
             // Dynamic Agriculture News Section
             const AgricultureNewsSection(),
           ],
