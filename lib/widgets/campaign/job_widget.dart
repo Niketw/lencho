@@ -1,88 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lencho/controllers/campaign/campPost_controller.dart';
-import 'package:lencho/models/campaign.dart';
+import 'package:lencho/controllers/campaign/jobPost_controller.dart';
+import 'package:lencho/models/job.dart';
 
-class CampaignsSection extends StatelessWidget {
-  const CampaignsSection({Key? key}) : super(key: key);
+class JobsSection extends StatelessWidget {
+  const JobsSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Ensure the CampaignController is registered.
-    final CampaignController controller = Get.put(CampaignController());
+    // Ensure the JobController is registered.
+    final JobController controller = Get.put(JobController());
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
-      child: StreamBuilder<List<Campaign>>(
-        stream: controller.streamCampaigns(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error loading campaigns: ${snapshot.error}'),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final campaigns = snapshot.data!;
-          if (campaigns.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text('No campaigns posted yet.'),
-            );
-          }
-          return Column(
+    return StreamBuilder<List<Job>>(
+      stream: controller.streamJobs(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error loading jobs: ${snapshot.error}'),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final jobs = snapshot.data!;
+        if (jobs.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text('No jobs posted yet.'),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section title
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
                 child: Text(
-                  'Campaigns',
+                  'Jobs',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ),
-              // Horizontal list of expandable campaign cards.
+              // Horizontal list of expandable job cards.
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: campaigns.map((campaign) {
+                  children: jobs.map((job) {
                     return Container(
                       width: 300, // Fixed width for each card.
                       margin: const EdgeInsets.only(right: 16.0, bottom: 8.0),
-                      child: ExpandableCampaignCard(campaign: campaign),
+                      child: ExpandableJobCard(job: job),
                     );
                   }).toList(),
                 ),
               ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
-class ExpandableCampaignCard extends StatefulWidget {
-  final Campaign campaign;
+class ExpandableJobCard extends StatefulWidget {
+  final Job job;
 
-  const ExpandableCampaignCard({Key? key, required this.campaign})
-      : super(key: key);
+  const ExpandableJobCard({Key? key, required this.job}) : super(key: key);
 
   @override
-  _ExpandableCampaignCardState createState() => _ExpandableCampaignCardState();
+  _ExpandableJobCardState createState() => _ExpandableJobCardState();
 }
 
-class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
+class _ExpandableJobCardState extends State<ExpandableJobCard> {
   bool isExpanded = false;
-  // Set collapsed height to 146.0 to display:
+  // Set a fixed collapsed height to show:
   // - Title (2 lines)
-  // - Organisation (1 line)
+  // - Company (1 line)
   // - Location (1 line)
   final double collapsedHeight = 146.0;
 
@@ -94,7 +92,7 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
         elevation: 2,
-        // Use same color scheme as news section:
+        // Use a color scheme similar to your news section.
         color: const Color(0xFFE8F4FF),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -115,20 +113,20 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Campaign Title in bold (2 lines max when collapsed)
+                  // Job Title in bold (1 lines max when collapsed)
                   Text(
-                    widget.campaign.title,
+                    widget.job.title,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: isExpanded ? null : 2,
+                    maxLines: isExpanded ? null : 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  // Organisation (non-bold, single line)
+                  const SizedBox(height: 4),
+                  // Company (non-bold, single line)
                   Text(
-                    widget.campaign.organisation,
+                    widget.job.organisation,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
@@ -139,7 +137,16 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
                   const SizedBox(height: 4),
                   // Location (non-bold, single line)
                   Text(
-                    widget.campaign.location,
+                    widget.job.location,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    widget.job.salaryPerWeek.toStringAsFixed(2),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
@@ -164,12 +171,12 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
                       },
                     ),
                   ),
-                  // When expanded, show campaign details.
+                  // When expanded, show job details.
                   if (isExpanded) ...[
                     const Divider(),
                     const SizedBox(height: 8),
                     Text(
-                      widget.campaign.details,
+                      widget.job.details,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.normal,

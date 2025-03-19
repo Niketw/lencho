@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
               // When authorized: indices: 0:Home, 1:Add, 2:Search, 3:Chat.
               if (index == 1) {
                 // Navigate to campaign posting.
-                Get.to(() => CampaignPostingWidget());
+                Get.to(() => PostingWidget());
               } else if (index == 3) {
                 Get.to(() => const ChatListPage());
               }

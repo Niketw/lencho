@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lencho/widgets/campaign/job_widget.dart';
 import 'package:lencho/widgets/home/section_widgets.dart';
 import 'package:lencho/widgets/campaign/campaign_widget.dart';
 import 'package:lencho/widgets/news/agri_news_widgets.dart';
@@ -70,6 +71,8 @@ class HomeContent extends StatelessWidget {
 
             // Dynamic Campaigns Section
             const CampaignsSection(),
+
+            const JobsSection(),
 
             // Dynamic Agriculture News Section
             const AgricultureNewsSection(),
