@@ -13,13 +13,11 @@ class WeatherMapWidget extends StatefulWidget {
 class _WeatherMapWidgetState extends State<WeatherMapWidget> {
   GoogleMapController? _mapController;
   LatLng? _pickedLocation;
-  // Get the WeatherController (ensure it's registered in your app).
   final WeatherController weatherController = Get.find<WeatherController>();
 
   @override
   void initState() {
     super.initState();
-    // Set a default initial location (e.g., San Francisco).
     _pickedLocation = const LatLng(37.7749, -122.4194);
   }
 
@@ -35,12 +33,10 @@ class _WeatherMapWidgetState extends State<WeatherMapWidget> {
 
   Future<void> _selectLocation() async {
     if (_pickedLocation != null) {
-      // Update the WeatherController with the selected coordinates.
       weatherController.latitude.value = _pickedLocation!.latitude;
       weatherController.longitude.value = _pickedLocation!.longitude;
       await weatherController.fetchWeather();
-      // Close the map screen.
-      Get.back();
+      Get.back(result: _pickedLocation);
     } else {
       Get.snackbar('Error', 'Please tap on the map to select a location.');
     }
@@ -88,3 +84,5 @@ class _WeatherMapWidgetState extends State<WeatherMapWidget> {
     );
   }
 }
+
+
