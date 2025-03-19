@@ -4,22 +4,25 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:lencho/widgets/irrigation/location_widget.dart'; 
+import 'package:lencho/widgets/irrigation/weather_map_widget.dart'; // This should point to your LocationPickerScreen
 
 class WeatherController extends GetxController {
-
+  // Observable variables to hold weather data.
   RxDouble temperature = 0.0.obs;
   RxString locationName = ''.obs;
   RxDouble latitude = 0.0.obs;
   RxDouble longitude = 0.0.obs;
 
+  // Replace with your actual WeatherAPI key.
   final String apiKey = 'WEATHER_API';
+  // WeatherAPI endpoint for current weather.
   final String baseUrl = 'http://api.weatherapi.com/v1/current.json';
 
   @override
   void onInit() {
     super.onInit();
-    fetchLocationAndWeather();
+    // We no longer call fetchLocationAndWeather() automatically.
+    // The user must tap the location icon.
   }
 
   Future<void> fetchLocationAndWeather() async {
@@ -65,7 +68,7 @@ class WeatherController extends GetxController {
 
   // Open the location picker to manually select a location.
   Future<void> pickLocationManually() async {
-    final result = await Get.to(() => const LocationPickerScreen());
+    final result = await Get.to(() => const WeatherMapWidget());
     if (result != null && result is LatLng) {
       latitude.value = result.latitude;
       longitude.value = result.longitude;

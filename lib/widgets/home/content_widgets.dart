@@ -5,6 +5,7 @@ import 'package:lencho/widgets/home/section_widgets.dart';
 import 'package:lencho/widgets/campaign/campaign_widget.dart';
 import 'package:lencho/widgets/news/agri_news_widgets.dart';
 import 'package:lencho/screens/community/community_browse_page.dart';
+import 'package:lencho/widgets/disease/disease_widget.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({Key? key}) : super(key: key);
@@ -58,8 +59,10 @@ class HomeContent extends StatelessWidget {
               items: [
                 SectionItem(
                   title: 'Disease Detection',
-                  onTap: () =>
-                      Navigator.pushNamed(context, '/dashboard/disease'),
+                  onTap: () {
+                    // Navigate to DiseaseDetectionWidget
+                    Get.to(() => DiseaseDetectionWidget());
+                  },
                 ),
                 SectionItem(
                   title: 'Irrigation Plan',

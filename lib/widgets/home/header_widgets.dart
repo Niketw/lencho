@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lencho/controllers/home/logout_controller.dart';
+import 'package:lencho/controllers/irrigation/weather_controller.dart';
 import 'package:lencho/widgets/BushCloudRotated.dart';
-import 'package:lencho/widgets/irrigation/location_widget.dart'; // adjust this path
+import 'package:lencho/widgets/irrigation/weather_map_widget.dart'; // Adjust path if needed
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({Key? key}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
+    // Register or find the WeatherController.
+    final WeatherController weatherController = Get.put(WeatherController());
+    
     return Stack(
       children: [
         const SizedBox(
@@ -22,11 +27,20 @@ class HomeHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Wrap the location icon in an InkWell to handle taps.
+                // When tapped, navigate to the LocationPickerScreen.
                 InkWell(
-                  onTap: () {
-                    // Navigate to the LocationPickerScreen when tapped.
-                    Get.to(() => const LocationPickerScreen());
+                  onTap: () async {
+                    final result = await Get.to(() => const WeatherMapWidget());
+                    if (result != null && result is LatLng) {
+                      weatherController.latitude.value = result.latitude;
+                      weatherController.longitude.value = result.longitude;
+                      await weatherController.fetchWeather();
+                      Get.snackbar(
+                        'Weather Updated',
+                        'Temp: ${weatherController.temperature.value.toStringAsFixed(1)}°C',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
                   },
                   child: const Icon(
                     Icons.location_on,
