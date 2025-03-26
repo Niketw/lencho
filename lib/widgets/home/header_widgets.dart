@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart'; // Use latlong2 for LatLng type.
 import 'package:lencho/controllers/irrigation/weather_controller.dart';
 import 'package:lencho/controllers/home/language_controller.dart';
 import 'package:lencho/widgets/BushCloudRotated.dart';
-import 'package:lencho/widgets/irrigation/weather_map_widget.dart'; 
+import 'package:lencho/widgets/irrigation/location_widget.dart'; // Your flutter_map-based location picker
+
 class HomeHeader extends StatelessWidget {
   const HomeHeader({Key? key}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
+    // Register or retrieve controllers.
     final WeatherController weatherController = Get.put(WeatherController());
     final LanguageController languageController = Get.put(LanguageController());
     
@@ -26,10 +28,10 @@ class HomeHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Location icon: when tapped, navigate to the WeatherMapWidget.
+                // Location icon: when tapped, navigate to the location picker.
                 InkWell(
                   onTap: () async {
-                    final result = await Get.to(() => const WeatherMapWidget());
+                    final result = await Get.to(() => const LocationPickerScreen());
                     if (result != null && result is LatLng) {
                       weatherController.latitude.value = result.latitude;
                       weatherController.longitude.value = result.longitude;
@@ -65,7 +67,7 @@ class HomeHeader extends StatelessWidget {
                   bool isHindi = languageController.currentLanguage.value == "hi";
                   return Row(
                     children: [
-                      const Text("EN", style: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                      const Text("EN", style: TextStyle(color: Colors.black)),
                       Switch(
                         value: isHindi,
                         onChanged: (value) {
@@ -81,7 +83,7 @@ class HomeHeader extends StatelessWidget {
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.green,
                       ),
-                      const Text("HI", style: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                      const Text("HI", style: TextStyle(color: Colors.black)),
                     ],
                   );
                 }),

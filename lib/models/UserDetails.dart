@@ -7,6 +7,8 @@ class UserDetails {
   final String city;
   final String state;
   final String postalZip;
+  final double? latitude; // new field for latitude
+  final double? longitude; // new field for longitude
   final DateTime? updatedAt;
 
   UserDetails({
@@ -16,6 +18,8 @@ class UserDetails {
     required this.city,
     required this.state,
     required this.postalZip,
+    this.latitude,
+    this.longitude,
     this.updatedAt,
   });
 
@@ -28,6 +32,8 @@ class UserDetails {
       city: map['city'] ?? '',
       state: map['state'] ?? '',
       postalZip: map['postalZip'] ?? '',
+      latitude: map['latitude'] != null ? (map['latitude'] as num).toDouble() : null,
+      longitude: map['longitude'] != null ? (map['longitude'] as num).toDouble() : null,
       updatedAt: map['updatedAt'] != null
           ? (map['updatedAt'] as Timestamp).toDate()
           : null,
@@ -42,6 +48,8 @@ class UserDetails {
       'city': city,
       'state': state,
       'postalZip': postalZip,
+      'latitude': latitude,
+      'longitude': longitude,
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
     };
   }
