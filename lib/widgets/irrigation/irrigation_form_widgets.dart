@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lencho/controllers/irrigation/irrigation_form_controller.dart';
+import 'package:lencho/widgets/irrigation/irrigation_result_widget.dart';
 
 class IrrigationPlanForm extends StatefulWidget {
   const IrrigationPlanForm({Key? key}) : super(key: key);
@@ -13,8 +14,24 @@ class _IrrigationPlanFormState extends State<IrrigationPlanForm> {
   final _formKey = GlobalKey<FormState>();
 
   // Dropdown options.
-  final List<String> cropTypes = ['Wheat', 'Corn', 'Rice', 'Soybean'];
-  final List<String> soilTypes = ['Sandy', 'Clay', 'Loamy', 'Silty'];
+  final List<String> cropTypes = [
+    'BANANA',
+    'BEAN',
+    'CABBAGE',
+    'CITRUS',
+    'COTTON',
+    'MAIZE',
+    'MELON',
+    'MUSTARD',
+    'ONION',
+    'POTATO',
+    'RICE',
+    'SOYABEAN',
+    'SUGARCANE',
+    'TOMATO',
+    'WHEAT'
+  ];
+  final List<String> soilTypes = ['DRY', 'HUMID', 'WET'];
 
   String? selectedCrop;
   String? selectedSoil;
@@ -24,28 +41,17 @@ class _IrrigationPlanFormState extends State<IrrigationPlanForm> {
   Future<void> submitPlan() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final result = await planController.submitIrrigationPlan(
+        double? prediction = await planController.predictIrrigationPlan(
           cropType: selectedCrop!,
           soilType: selectedSoil!,
         );
-        Get.defaultDialog(
-          title: "Irrigation Plan",
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Crop Type: ${result['cropType']}"),
-              Text("Soil Type: ${result['soilType']}"),
-              Text("Region: ${result['region']}"),
-              Text("Temperature: ${result['temperature'].toStringAsFixed(1)}°C"),
-              Text("Temp Classification: ${result['tempClassification']}"),
-              Text("Weather Type: ${result['weatherType']}"),
-            ],
-          ),
-          textConfirm: "OK",
-          onConfirm: () {
-            Get.back();
-          },
-        );
+        if (prediction != null) {
+          // Display the prediction using a floating widget.
+          Get.dialog(
+            IrrigationResultWidget(prediction: prediction),
+            barrierDismissible: true,
+          );
+        }
       } catch (e) {
         Get.snackbar("Error", "Failed to submit irrigation plan: $e");
       }

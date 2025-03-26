@@ -103,11 +103,48 @@ class IrrigationPlanController extends GetxController {
     print("weatherType: $currentWeatherType");
 
     return {
-      "cropType": cropType,
-      "soilType": soilType,
-      "region": region,
-      "tempClassification": tempClassification,
-      "weatherType": currentWeatherType,
+      "CROP TYPE": cropType,
+      "SOIL TYPE": soilType,
+      "REGION": region,
+      "TEMPERATURE": tempClassification,
+      "WEATHER CONDITION": currentWeatherType,
     };
+  }
+
+  /// Sends the irrigation plan to the API and returns a prediction (floating number).
+  Future<double?> predictIrrigationPlan({
+    required String cropType,
+    required String soilType,
+  }) async {
+    // First, get the plan details.
+    Map<String, dynamic> planData = await submitIrrigationPlan(
+      cropType: cropType,
+      soilType: soilType,
+    );
+    print("planData: $planData");
+    // Construct the API URL.
+    final url = Uri.parse("https://lencho2-irrigation.hf.space/predict-irrigation");
+    
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(planData),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // Assume API returns the prediction in a field named "prediction".
+        double prediction = (data["predicted_water_requirement"] as num).toDouble();
+        return prediction;
+      } else {
+        Get.snackbar("Error", "Prediction API returned: ${response.statusCode}");
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Error predicting irrigation: $e");
+      return null;
+    }
   }
 }
