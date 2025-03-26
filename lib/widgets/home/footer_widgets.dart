@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lencho/controllers/home/authUser_controller.dart';
 import 'package:lencho/controllers/home/logout_controller.dart';
 import 'package:lencho/screens/chat/chat_list_page.dart';
+import 'package:lencho/screens/community/community_browse_page.dart';
 import 'package:lencho/widgets/campaign/posting_widget.dart';
 
 class FooterNavigationBar extends StatelessWidget {
@@ -27,16 +28,16 @@ class FooterNavigationBar extends StatelessWidget {
             label: 'Add',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
+            icon: Icon(Icons.people),
+            label: 'Community',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
             label: 'Chat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.logout),
-            label: 'Logout',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ];
       } else {
@@ -46,41 +47,140 @@ class FooterNavigationBar extends StatelessWidget {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
+            icon: Icon(Icons.people),
+            label: 'Community',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
             label: 'Chat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.logout),
-            label: 'Logout',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ];
       }
 
-      return BottomNavigationBar(
-        items: items,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (isAuth) {
-            if (index == 1) {
-              Get.to(() => PostingWidget());
-            } else if (index == 3) {
-              Get.to(() => const ChatListPage());
-            } else if (index == 4) {
-              LogoutController.instance.logout();
+      return Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color(0xFFFFF4BE),
+              Color(0xFFACE268),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2D5A27).withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          items: items,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          selectedItemColor: const Color(0xFF2D5A27),
+          unselectedItemColor: const Color(0xFF557153),
+          elevation: 0,
+          onTap: (index) {
+            if (isAuth) {
+              if (index == 0) {
+                // Do nothing, already on home
+              } else if (index == 1) {
+                Get.to(() => PostingWidget());
+              } else if (index == 2) {
+                Get.to(() => const CommunityBrowsePage());
+              } else if (index == 3) {
+                Get.to(() => const ChatListPage());
+              } else if (index == 4) {
+                // Profile or logout
+                _showProfileOptions(context);
+              }
+            } else {
+              if (index == 0) {
+                // Do nothing, already on home
+              } else if (index == 1) {
+                Get.to(() => const CommunityBrowsePage());
+              } else if (index == 2) {
+                Get.to(() => const ChatListPage());
+              } else if (index == 3) {
+                // Profile or logout
+                _showProfileOptions(context);
+              }
             }
-          } else {
-            if (index == 2) {
-              Get.to(() => const ChatListPage());
-            } else if (index == 3) {
-              LogoutController.instance.logout();
-            }
-          }
-        },
+          },
+        ),
       );
     });
+  }
+
+  void _showProfileOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFFF4BE),
+              Color(0xFFACE268),
+            ],
+          ),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFF2D5A27),
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+                title: const Text(
+                  'Profile',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D5A27),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  // Navigate to profile page
+                },
+              ),
+              const Divider(color: Color(0xFF2D5A27)),
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFF2D5A27),
+                  child: Icon(Icons.logout, color: Colors.white),
+                ),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D5A27),
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  LogoutController.instance.logout();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

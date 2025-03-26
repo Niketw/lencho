@@ -15,7 +15,10 @@ class AgricultureNewsSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5A27)),
+          ));
         }
         if (controller.errorMessage.isNotEmpty) {
           return Center(child: Text(controller.errorMessage.value));
@@ -30,28 +33,32 @@ class AgricultureNewsSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section title
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12.0),
               child: Text(
-                'Agriculture News',
+                'AGRICULTURE NEWS',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+                  color: Color(0xFF2D5A27),
+                  letterSpacing: 1.2,
                 ),
               ),
             ),
             // Horizontal list of expandable news cards.
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: controller.newsList.map((newsItem) {
+            SizedBox(
+              height: 220,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.newsList.length,
+                itemBuilder: (context, index) {
                   return Container(
-                    width: 300, // Fixed width for each card.
-                    margin: const EdgeInsets.only(right: 16.0, bottom: 8.0),
-                    child: ExpandableNewsCard(newsItem: newsItem),
+                    width: 300,
+                    margin: const EdgeInsets.only(right: 16.0),
+                    child: ExpandableNewsCard(
+                        newsItem: controller.newsList[index]),
                   );
-                }).toList(),
+                },
               ),
             ),
           ],
@@ -73,7 +80,6 @@ class ExpandableNewsCard extends StatefulWidget {
 
 class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
   bool isExpanded = false;
-  // Fixed collapsed height to show 3 lines for title and 2 lines for description.
   final double initialCardHeight = 165.0;
 
   @override
@@ -81,70 +87,143 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      child: Card(
-        elevation: 3,
-        // Using the same color scheme as the campaigns section.
-        color: const Color(0xFFE8F4FF),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: Color(0xFF2D5A27),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFFFFFF),
+              Color(0xFFACE268),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2D5A27).withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          border: Border.all(
+            color: const Color(0xFF2D5A27).withOpacity(0.2),
             width: 1,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            // Fixed width for every card.
-            width: 300,
-            // When collapsed, constrain the height; when expanded, let content dictate height.
-            child: ConstrainedBox(
-              constraints: isExpanded
-                  ? const BoxConstraints()
-                  : BoxConstraints(maxHeight: initialCardHeight),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // News Title (up to 3 lines when collapsed)
-                  Text(
-                    widget.newsItem['title'] ?? 'No Title',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // News header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFF4BE),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Color(0xFF2D5A27),
+                      width: 0.5,
                     ),
-                    maxLines: isExpanded ? null : 3,
-                    overflow:
-                        isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  // News Description (up to 2 lines when collapsed)
-                  Text(
-                    widget.newsItem['description'] ?? 'No description available',
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                    maxLines: isExpanded ? null : 2,
-                    overflow:
-                        isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                  ),
-                  // Expand/Collapse arrow button.
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: Icon(
-                        isExpanded
-                            ? Icons.arrow_drop_up
-                            : Icons.arrow_drop_down,
-                        size: 24,
-                      ),
-                      onPressed: () {
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Icon(
+                      Icons.article_outlined,
+                      color: Color(0xFF2D5A27),
+                      size: 20,
+                    ),
+                    GestureDetector(
+                      onTap: () {
                         setState(() {
                           isExpanded = !isExpanded;
                         });
                       },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: const Color(0xFF2D5A27),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // News content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: isExpanded
+                        ? const BoxConstraints()
+                        : const BoxConstraints(maxHeight: 180),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.newsItem['title'] ?? 'No Title',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D5A27),
+                          ),
+                          maxLines: isExpanded ? null : 2,
+                          overflow: isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.newsItem['description'] ??
+                              'No description available',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                          maxLines: isExpanded ? null : 4,
+                          overflow: isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                        ),
+                        if (isExpanded && widget.newsItem['url'] != null) ...[
+                          const SizedBox(height: 16),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: TextButton.icon(
+                              icon: const Icon(
+                                Icons.open_in_new,
+                                size: 16,
+                                color: Color(0xFF2D5A27),
+                              ),
+                              label: const Text(
+                                'Read More',
+                                style: TextStyle(
+                                  color: Color(0xFF2D5A27),
+                                ),
+                              ),
+                              onPressed: () {
+                                // Open URL
+                              },
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

@@ -12,7 +12,7 @@ class CampaignsSection extends StatelessWidget {
     final CampaignController controller = Get.put(CampaignController());
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: StreamBuilder<List<Campaign>>(
         stream: controller.streamCampaigns(),
         builder: (context, snapshot) {
@@ -22,7 +22,10 @@ class CampaignsSection extends StatelessWidget {
             );
           }
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5A27)),
+            ));
           }
           final campaigns = snapshot.data!;
           if (campaigns.isEmpty) {
@@ -35,29 +38,31 @@ class CampaignsSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section title
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12.0),
                 child: Text(
-                  'Campaigns',
+                  'CAMPAIGNS',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    color: Color(0xFF2D5A27),
+                    letterSpacing: 1.2,
                   ),
                 ),
               ),
               // Horizontal list of expandable campaign cards.
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: campaigns.map((campaign) {
+              SizedBox(
+                height: 220,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: campaigns.length,
+                  itemBuilder: (context, index) {
                     return Container(
-                      width: 300, // Fixed width for each card.
-                      margin: const EdgeInsets.only(right: 16.0, bottom: 8.0),
-                      child: ExpandableCampaignCard(campaign: campaign),
+                      width: 300,
+                      margin: const EdgeInsets.only(right: 16.0),
+                      child: ExpandableCampaignCard(campaign: campaigns[index]),
                     );
-                  }).toList(),
+                  },
                 ),
               ),
             ],
@@ -80,10 +85,6 @@ class ExpandableCampaignCard extends StatefulWidget {
 
 class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
   bool isExpanded = false;
-  // Set collapsed height to 146.0 to display:
-  // - Title (2 lines)
-  // - Organisation (1 line)
-  // - Location (1 line)
   final double collapsedHeight = 146.0;
 
   @override
@@ -91,93 +92,180 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-        elevation: 2,
-        // Use same color scheme as news section:
-        color: const Color(0xFFE8F4FF),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: Color(0xFF2D5A27),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFFFFFF),
+              Color(0xFFFFF4BE),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2D5A27).withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          border: Border.all(
+            color: const Color(0xFF2D5A27).withOpacity(0.2),
             width: 1,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
           child: Container(
-            width: 300, // Fixed width for every card.
-            // When collapsed, constrain the height; when expanded, let content dictate height.
-            child: ConstrainedBox(
-              constraints: isExpanded
-                  ? const BoxConstraints()
-                  : BoxConstraints(maxHeight: collapsedHeight),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Campaign Title in bold (2 lines max when collapsed)
-                  Text(
-                    widget.campaign.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: isExpanded ? null : 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  // Organisation (non-bold, single line)
-                  Text(
-                    widget.campaign.organisation,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  // Location (non-bold, single line)
-                  Text(
-                    widget.campaign.location,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  // Expand/Collapse arrow button.
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: Icon(
-                        isExpanded
-                            ? Icons.arrow_drop_up
-                            : Icons.arrow_drop_down,
-                        size: 24,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isExpanded = !isExpanded;
-                        });
-                      },
-                    ),
-                  ),
-                  // When expanded, show campaign details.
-                  if (isExpanded) ...[
-                    const Divider(),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.campaign.details,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
+            width: 300,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Campaign header
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFACE268),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Color(0xFF2D5A27),
+                        width: 0.5,
                       ),
                     ),
-                  ],
-                ],
-              ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.campaign.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D5A27),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isExpanded = !isExpanded;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: const Color(0xFF2D5A27),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Campaign content
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: isExpanded
+                        ? const BoxConstraints()
+                        : BoxConstraints(maxHeight: 120),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.business,
+                              size: 16,
+                              color: Color(0xFF2D5A27),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                widget.campaign.organisation,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 16,
+                              color: Color(0xFF2D5A27),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                widget.campaign.location,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (isExpanded) ...[
+                          const Text(
+                            'Details:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D5A27),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.campaign.details,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(height: 16),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2D5A27),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                              ),
+                              child: const Text('Join Campaign'),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
