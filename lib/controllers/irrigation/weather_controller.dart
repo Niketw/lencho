@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
 class WeatherController extends GetxController {
   RxDouble temperature = 0.0.obs;
   RxString locationName = ''.obs;
+  RxString weatherType = ''.obs; 
   RxDouble latitude = 0.0.obs;
   RxDouble longitude = 0.0.obs;
 
@@ -65,6 +66,7 @@ class WeatherController extends GetxController {
         final data = json.decode(response.body);
         temperature.value = (data['current']['temp_c'] ?? 0).toDouble();
         locationName.value = data['location']['name'] ?? 'Unknown';
+        weatherType.value = data['current']['condition']['text'] ?? 'Unknown';
       } else {
         Get.snackbar('Error', 'Failed to fetch weather data: ${response.statusCode}');
       }

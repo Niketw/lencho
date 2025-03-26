@@ -6,6 +6,7 @@ import 'package:lencho/widgets/campaign/campaign_widget.dart';
 import 'package:lencho/widgets/news/agri_news_widgets.dart';
 import 'package:lencho/screens/community/community_browse_page.dart';
 import 'package:lencho/widgets/disease/disease_widget.dart';
+import 'package:lencho/widgets/irrigation/irrigation_form_widgets.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({Key? key}) : super(key: key);
@@ -66,8 +67,9 @@ class HomeContent extends StatelessWidget {
                 ),
                 SectionItem(
                   title: 'Irrigation Plan',
-                  onTap: () =>
-                      Navigator.pushNamed(context, '/dashboard/irrigation'),
+                  onTap: () {
+                    Get.to(() => const IrrigationPlanForm());
+                  },
                 ),
               ],
             ),
