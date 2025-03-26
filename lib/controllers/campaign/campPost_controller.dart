@@ -11,7 +11,7 @@ class CampaignController extends GetxController {
     required String organisation,
     required String location,
     required String details,
-  }) async {
+  })async {
     final campaignData = {
       'title': title,
       'organisation': organisation,
