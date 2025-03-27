@@ -16,13 +16,11 @@ class HomePage extends StatelessWidget {
     final AuthUserController authController = Get.put(AuthUserController());
     
     return Scaffold(
-      body: Stack(
-        children: [
-          Column(
-            children: const [
-              HomeHeader(),
-              HomeContent(),
-            ],
+      body: Column(
+        children: const [
+          HomeHeader(), // fixed height header
+          Expanded(       // HomeContent scrolls within the remaining space
+            child: HomeContent(),
           ),
         ],
       ),
