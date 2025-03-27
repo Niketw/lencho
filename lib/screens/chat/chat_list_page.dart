@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lencho/screens/chat/chat_page.dart';
 import 'package:lencho/screens/chat/user_search_page.dart';
+import 'package:lencho/widgets/home/header_widgets.dart';
 
 class ChatListPage extends StatelessWidget {
   const ChatListPage({Key? key}) : super(key: key);
@@ -14,111 +15,155 @@ class ChatListPage extends StatelessWidget {
     final currentEmail = currentUser?.email ?? '';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Chats'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Get.to(() => const UserSearchPage());
-            },
-          ),
-        ],
-      ),
+      backgroundColor: const Color.fromRGBO(245, 247, 255, 1),
       body: currentUser == null || currentEmail.isEmpty
-          ? const Center(child: Text('Please log in to access chat'))
-          : StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('chats')
-                  .where('participantsEmails', arrayContains: currentEmail)
-                  // If some documents have null for lastMessageTime, consider using a default value in your query
-                  .orderBy('lastMessageTime', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+          ? const Center(
+              child: Text(
+                'Please log in to access chat',
+                style: TextStyle(color: Color(0xFF2D5A27)),
+              ),
+            )
+          : Column(
+              children: [
+                // Replace the current header with the HomeHeader widget.
+                const HomeHeader(isHome: false),
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('chats')
+                        .where('participantsEmails', arrayContains: currentEmail)
+                        .orderBy('lastMessageTime', descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                final chatDocs = snapshot.hasData ? snapshot.data!.docs : [];
-                if (chatDocs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('No chat history found'),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            Get.to(() => const UserSearchPage());
-                          },
-                          child: const Text('Find someone to chat with'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: chatDocs.length,
-                  itemBuilder: (context, index) {
-                    final chatDoc = chatDocs[index];
-                    final chatData = chatDoc.data() as Map<String, dynamic>;
-
-                    // Debug print to inspect chat document data.
-                    print("Chat Document Data: $chatData");
-
-                    // Retrieve participant emails.
-                    final List<dynamic> emailsDynamic =
-                        chatData['participantsEmails'] ?? [];
-                    final List<String> emails =
-                        emailsDynamic.map((e) => e.toString()).toList();
-
-                    // Retrieve the user IDs.
-                    final participants =
-                        List<String>.from(chatData['participants']);
-                    final otherUserId = participants.firstWhere(
-                      (id) => id != currentUser.uid,
-                      orElse: () => 'Unknown',
-                    );
-
-                    // Retrieve the other user's email.
-                    final otherEmails =
-                        emails.where((email) => email != currentEmail).toList();
-                    final otherUserEmail =
-                        otherEmails.isNotEmpty ? otherEmails.first : 'Unknown';
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text(otherUserEmail.isNotEmpty
-                            ? otherUserEmail[0].toUpperCase()
-                            : '?'),
-                      ),
-                      title: Text(otherUserEmail),
-                      subtitle: Text(
-                        chatData['lastMessage'] ?? 'Start a conversation',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: chatData['lastMessageTime'] != null
-                          ? Text(
-                              _formatTimestamp(
-                                  chatData['lastMessageTime'] as Timestamp),
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
+                      final chatDocs = snapshot.hasData ? snapshot.data!.docs : [];
+                      if (chatDocs.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'No chat history found',
+                                style: TextStyle(color: Color(0xFF2D5A27)),
                               ),
-                            )
-                          : null,
-                      onTap: () {
-                        Get.to(() => ChatPage(
-                              chatId: chatDoc.id,
-                              otherUserId: otherUserId,
-                            ));
-                      },
-                    );
-                  },
-                );
-              },
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFACE268),
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Get.to(() => const UserSearchPage());
+                                },
+                                child: const Text(
+                                  'Find someone to chat with',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return ListView.separated(
+                        separatorBuilder: (context, index) => const Divider(
+                          height: 1,
+                          indent: 16,
+                          endIndent: 16,
+                        ),
+                        itemCount: chatDocs.length,
+                        itemBuilder: (context, index) {
+                          final chatDoc = chatDocs[index];
+                          final chatData = chatDoc.data() as Map<String, dynamic>;
+
+                          // Retrieve participant emails.
+                          final List<dynamic> emailsDynamic =
+                              chatData['participantsEmails'] ?? [];
+                          final List<String> emails =
+                              emailsDynamic.map((e) => e.toString()).toList();
+
+                          // Retrieve the user IDs.
+                          final participants = List<String>.from(chatData['participants']);
+                          final otherUserId = participants.firstWhere(
+                            (id) => id != currentUser.uid,
+                            orElse: () => 'Unknown',
+                          );
+
+                          // Retrieve the other user's email.
+                          final otherEmails =
+                              emails.where((email) => email != currentEmail).toList();
+                          final otherUserEmail =
+                              otherEmails.isNotEmpty ? otherEmails.first : 'Unknown';
+
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            leading: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFACE268),
+                                  width: 2,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: Text(
+                                  otherUserEmail.isNotEmpty
+                                      ? otherUserEmail[0].toUpperCase()
+                                      : '?',
+                                  style: const TextStyle(
+                                    color: Color(0xFF2D5A27),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              otherUserEmail,
+                              style: const TextStyle(
+                                color: Color(0xFF2D5A27),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              chatData['lastMessage'] ?? 'Start a conversation',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Color(0xFF2D5A27)),
+                            ),
+                            trailing: chatData['lastMessageTime'] != null
+                                ? Text(
+                                    _formatTimestamp(
+                                        chatData['lastMessageTime'] as Timestamp),
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                : null,
+                            onTap: () {
+                              Get.to(() => ChatPage(
+                                    chatId: chatDoc.id,
+                                    otherUserId: otherUserId,
+                                  ));
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
     );
   }

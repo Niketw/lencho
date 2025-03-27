@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:lencho/widgets/home/header_widgets.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatId;
@@ -43,12 +44,13 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(otherUserName),
-      ),
+     
+      // Using a soft light background.
+      backgroundColor: const Color.fromRGBO(245, 247, 255, 1),
       body: Column(
         children: [
-          // Messages list
+          const HomeHeader(isHome: false),
+          // Messages list.
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _firestore
@@ -64,7 +66,10 @@ class _ChatPageState extends State<ChatPage> {
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(
-                    child: Text('No messages yet. Start a conversation!'),
+                    child: Text(
+                      'No messages yet. Start a conversation!',
+                      style: TextStyle(color: Color(0xFF2D5A27)),
+                    ),
                   );
                 }
 
@@ -88,12 +93,22 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
-          // Input field
+          // Input field container with increased height.
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
             child: Row(
               children: [
-                // Message input field
+                // Message input field with a higher minLines value.
                 Expanded(
                   child: TextField(
                     controller: _messageController,
@@ -101,13 +116,14 @@ class _ChatPageState extends State<ChatPage> {
                       hintText: 'Type a message...',
                       border: InputBorder.none,
                     ),
-                    minLines: 1,
+                    minLines: 2,
                     maxLines: 5,
                   ),
                 ),
-                // Send button
+                // Send button styled with accent green.
                 IconButton(
                   icon: const Icon(Icons.send),
+                  color: const Color(0xFFACE268),
                   onPressed: _sendMessage,
                 ),
               ],
@@ -148,36 +164,57 @@ class _ChatPageState extends State<ChatPage> {
     required Timestamp timestamp,
   }) {
     final time = timestamp.toDate();
-    final timeString =
-        '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+    final timeString = '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
+            // Display avatar for the other user.
             CircleAvatar(
               radius: 16,
-              child: Text(otherUserName.isNotEmpty
-                  ? otherUserName[0].toUpperCase()
-                  : '?'),
+              backgroundColor: const Color(0xFFACE268).withOpacity(0.3),
+              child: Text(
+                otherUserName.isNotEmpty ? otherUserName[0].toUpperCase() : '?',
+                style: const TextStyle(
+                  color: Color(0xFF2D5A27),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(width: 8),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0, vertical: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               decoration: BoxDecoration(
-                color: isMe ? Colors.green.shade200 : Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(20),
+                // Different background colors for sent vs. received messages.
+                color: isMe
+                    ? const Color(0xFFACE268).withOpacity(0.3)
+                    : Colors.grey.shade200,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(20),
+                  topRight: const Radius.circular(20),
+                  bottomLeft: isMe ? const Radius.circular(20) : Radius.zero,
+                  bottomRight: isMe ? Radius.zero : const Radius.circular(20),
+                ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  Text(message),
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      color: Color(0xFF2D5A27),
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     timeString,
