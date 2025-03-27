@@ -26,6 +26,47 @@ class CommunityBrowsePage extends StatelessWidget {
         children: [
           // Insert the custom header.
           const HomeHeader(isHome: false),
+          // Add a search bar below the header.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: InkWell(
+              onTap: () => _showSearchDialog(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2D5A27).withOpacity(0.1),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: const Color(0xFFACE268).withOpacity(0.5),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(
+                      Icons.search,
+                      color: Color(0xFF2D5A27),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'Search communities...',
+                      style: TextStyle(
+                        color: Color(0xFF2D5A27),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           // Use Expanded to fill the remaining space with the list.
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
