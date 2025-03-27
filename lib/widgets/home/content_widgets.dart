@@ -16,140 +16,143 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     // Removed outer Expanded so that the SingleChildScrollView can size itself.
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Add top padding to move contents slightly lower.
-          const SizedBox(height: 20),
-          // Weather Widget above Community Updates.
-          const WeatherWidget(),
+      child: Transform.translate(
+        offset: const Offset(0, -35), // Moves all content 10 pixels upward.
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Add top padding to move contents slightly lower.
+            const SizedBox(height: 20),
+            // Weather Widget above Community Updates.
+            const WeatherWidget(),
 
-          // Community Updates Section
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: InkWell(
-              onTap: () {
-                Get.to(() => const CommunityBrowsePage());
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFFFFF4BE),
-                      Color(0xFFACE268),
-                    ],
+            // Community Updates Section
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: InkWell(
+                onTap: () {
+                  Get.to(() => const CommunityBrowsePage());
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
                   ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2D5A27).withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: const [
-                        Icon(
-                          Icons.people_alt_rounded,
-                          color: Color(0xFF2D5A27),
-                          size: 24,
-                        ),
-                        SizedBox(width: 16),
-                        Text(
-                          'Community Updates',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D5A27),
-                            letterSpacing: 0.5,
-                          ),
-                        ),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFFF4BE),
+                        Color(0xFFACE268),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
-                        shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2D5A27).withOpacity(0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
                       ),
-                      child: const Icon(
-                        Icons.arrow_forward,
-                        color: Color(0xFF2D5A27),
-                        size: 20,
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(
+                            Icons.people_alt_rounded,
+                            color: Color(0xFF2D5A27),
+                            size: 24,
+                          ),
+                          SizedBox(width: 16),
+                          Text(
+                            'Community Updates',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2D5A27),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: Color(0xFF2D5A27),
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Dashboard Section Title
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                'DASHBOARD',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D5A27),
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+
+            // Dashboard Items
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildDashboardItem(
+                      title: 'Disease Detection',
+                      icon: Icons.healing,
+                      onTap: () => Get.to(() => DiseaseDetectionWidget()),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildDashboardItem(
+                      title: 'Irrigation Plan',
+                      icon: Icons.water_drop,
+                      onTap: () => Get.to(() => const IrrigationPlanForm()),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
 
-          // Dashboard Section Title
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text(
-              'DASHBOARD',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D5A27),
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
+            const SizedBox(height: 24),
 
-          // Dashboard Items
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildDashboardItem(
-                    title: 'Disease Detection',
-                    icon: Icons.healing,
-                    onTap: () => Get.to(() => DiseaseDetectionWidget()),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildDashboardItem(
-                    title: 'Irrigation Plan',
-                    icon: Icons.water_drop,
-                    onTap: () => Get.to(() => const IrrigationPlanForm()),
-                  ),
-                ),
-              ],
-            ),
-          ),
+            // Dynamic Campaigns Section
+            const CampaignsSection(),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-          // Dynamic Campaigns Section
-          const CampaignsSection(),
+            // Jobs Section
+            const JobsSection(),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Jobs Section
-          const JobsSection(),
+            // Dynamic Agriculture News Section
+            const AgricultureNewsSection(),
 
-          const SizedBox(height: 16),
-
-          // Dynamic Agriculture News Section
-          const AgricultureNewsSection(),
-
-          // Bottom padding.
-          const SizedBox(height: 24),
-        ],
+            // Bottom padding.
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
