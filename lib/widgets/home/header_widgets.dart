@@ -13,7 +13,7 @@ class HomeHeader extends StatelessWidget {
     final LanguageController languageController = Get.put(LanguageController());
     
     // Define the total header height.
-    const double headerHeight = 140.0;
+    const double headerHeight = 130.0;
     
     return Container(
       height: headerHeight,
