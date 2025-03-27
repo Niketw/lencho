@@ -27,13 +27,10 @@ class ScrollableSection extends StatelessWidget {
             ),
           ),
         ),
-        // Container with a minimum height while allowing dynamic expansion.
-        Container(
-          constraints: const BoxConstraints(minHeight: 150),
-          // Use a horizontal ListView with shrinkWrap enabled.
+        // Use SizedBox with a fixed height to contain the ListView
+        SizedBox(
+          height: 180, // Fixed height that accommodates your cards
           child: ListView.builder(
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             itemCount: items.length,
@@ -61,81 +58,75 @@ class ExpandableSectionCard extends StatefulWidget {
 
 class _ExpandableSectionCardState extends State<ExpandableSectionCard> {
   bool isExpanded = false;
-  // Collapsed height for card content.
+  // Define fixed heights for collapsed and expanded states.
   final double collapsedHeight = 100.0;
+  final double expandedHeight = 250.0;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: Container(
-        width: 280,
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8F4FF),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: const Color(0xFF2D5A27),
-            width: 1,
-          ),
+    return Container(
+      width: 280,
+      height: isExpanded ? expandedHeight : collapsedHeight,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F4FF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF2D5A27),
+          width: 1,
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: widget.item.onTap,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ConstrainedBox(
-                constraints: isExpanded
-                    ? const BoxConstraints()
-                    : BoxConstraints(maxHeight: collapsedHeight),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title text (2 lines max when collapsed)
-                    Text(
-                      widget.item.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: isExpanded ? null : 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (widget.item.details != null) ...[
-                      const SizedBox(height: 8),
-                      // Expand/Collapse arrow button.
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: IconButton(
-                          icon: Icon(
-                            isExpanded
-                                ? Icons.arrow_drop_up
-                                : Icons.arrow_drop_down,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isExpanded = !isExpanded;
-                            });
-                          },
-                        ),
-                      ),
-                      if (isExpanded)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            widget.item.details!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.item.onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title text (2 lines max when collapsed)
+                Text(
+                  widget.item.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: isExpanded ? null : 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
+                if (widget.item.details != null) ...[
+                  const SizedBox(height: 8),
+                  // Expand/Collapse arrow button.
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: Icon(
+                        isExpanded
+                            ? Icons.arrow_drop_up
+                            : Icons.arrow_drop_down,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isExpanded = !isExpanded;
+                        });
+                      },
+                    ),
+                  ),
+                  if (isExpanded)
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Text(
+                          widget.item.details!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ],
             ),
           ),
         ),
@@ -155,3 +146,4 @@ class SectionItem {
     required this.onTap,
   });
 }
+
