@@ -19,6 +19,8 @@ class HomeContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Add top padding to move contents slightly lower.
+          const SizedBox(height: 20),
           // Weather Widget above Community Updates.
           const WeatherWidget(),
 
