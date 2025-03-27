@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:lencho/screens/community/community_detail_page.dart';
+import 'community_detail_page.dart';
 
 class CommunitySearchDelegate extends SearchDelegate {
   @override
@@ -64,7 +64,6 @@ class CommunitySearchDelegate extends SearchDelegate {
           itemBuilder: (context, index) {
             final doc = snapshot.data!.docs[index];
             final data = doc.data() as Map<String, dynamic>;
-
             return ListTile(
               leading: CircleAvatar(
                 backgroundImage: data['imageUrl'] != null

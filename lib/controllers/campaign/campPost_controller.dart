@@ -17,7 +17,6 @@ class CampaignController extends GetxController {
       'organisation': organisation,
       'location': location,
       'details': details,
-      // Use serverTimestamp so the server sets the time.
       'createdAt': FieldValue.serverTimestamp(),
     };
 

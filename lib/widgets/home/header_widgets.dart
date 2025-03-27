@@ -8,13 +8,13 @@ import 'package:lencho/widgets/irrigation/location_widget.dart'; // Your flutter
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({Key? key}) : super(key: key);
-
+  
   @override
   Widget build(BuildContext context) {
     // Register or retrieve controllers.
     final WeatherController weatherController = Get.put(WeatherController());
     final LanguageController languageController = Get.put(LanguageController());
-
+    
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -34,25 +34,23 @@ class HomeHeader extends StatelessWidget {
           ),
         ],
       ),
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(20.0),
       child: Stack(
         children: [
           const Positioned.fill(
             child: BushCloudRotated(),
           ),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Location button with rounded design
+                // Location button with rounded design.
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () async {
-                      final result =
-                          await Get.to(() => const LocationPickerScreen());
+                      final result = await Get.to(() => const LocationPickerScreen());
                       if (result != null && result is LatLng) {
                         weatherController.latitude.value = result.latitude;
                         weatherController.longitude.value = result.longitude;
@@ -79,8 +77,7 @@ class HomeHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Centered logo and title
+                // Centered logo and title.
                 Row(
                   children: [
                     Container(
@@ -102,14 +99,11 @@ class HomeHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Language toggle with better styling
+                // Language toggle switch with translation request.
                 Obx(() {
-                  bool isHindi =
-                      languageController.currentLanguage.value == "hi";
+                  bool isHindi = languageController.currentLanguage.value == "hi";
                   return Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(20),
@@ -119,22 +113,31 @@ class HomeHeader extends StatelessWidget {
                         Text(
                           "EN",
                           style: TextStyle(
-                            color: isHindi
-                                ? Colors.black54
-                                : const Color(0xFF2D5A27),
-                            fontWeight:
-                                isHindi ? FontWeight.normal : FontWeight.bold,
+                            color: isHindi ? Colors.black54 : const Color(0xFF2D5A27),
+                            fontWeight: isHindi ? FontWeight.normal : FontWeight.bold,
                           ),
                         ),
                         Switch(
                           value: isHindi,
-                          onChanged: (value) {
+                          onChanged: (value) async {
+                            // Toggle the language.
                             languageController.toggleLanguage();
-                            Get.snackbar(
-                              'Language Changed',
-                              value ? 'Hindi selected' : 'English selected',
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
+                            if (value) {
+                              // If Hindi is selected, call the translation API.
+                              try {
+                                // Example: translate "Lencho Inc." to Hindi.
+                                String translatedTitle = await languageController.translate("Lencho Inc.", targetLang: "hi");
+                                Get.snackbar(
+                                  'Language Changed',
+                                  'Hindi selected: $translatedTitle',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                );
+                              } catch (e) {
+                                Get.snackbar('Error', 'Translation failed: $e');
+                              }
+                            } else {
+                              Get.snackbar('Language Changed', 'English selected', snackPosition: SnackPosition.BOTTOM);
+                            }
                           },
                           activeColor: Colors.white,
                           activeTrackColor: const Color(0xFF2D5A27),
@@ -144,11 +147,8 @@ class HomeHeader extends StatelessWidget {
                         Text(
                           "HI",
                           style: TextStyle(
-                            color: isHindi
-                                ? const Color(0xFF2D5A27)
-                                : Colors.black54,
-                            fontWeight:
-                                isHindi ? FontWeight.bold : FontWeight.normal,
+                            color: isHindi ? const Color(0xFF2D5A27) : Colors.black54,
+                            fontWeight: isHindi ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
                       ],

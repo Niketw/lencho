@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lencho/controllers/community/community_controller.dart';
 
 class CommunityCreatePage extends StatefulWidget {
   const CommunityCreatePage({Key? key}) : super(key: key);
@@ -17,6 +19,10 @@ class _CommunityCreatePageState extends State<CommunityCreatePage> {
   final _tagsController = TextEditingController();
   bool _isPublic = true;
   bool _isLoading = false;
+  File? _selectedImage;
+  final CommunityController _controller = Get.put(CommunityController());
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void dispose() {
@@ -26,64 +32,33 @@ class _CommunityCreatePageState extends State<CommunityCreatePage> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 75,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
   Future<void> _createCommunity() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        Get.snackbar('Error', 'You must be logged in to create a community');
-        return;
-      }
+    // Instead of uploading to Firebase Storage, we pass the file to the controller.
+    await _controller.createCommunity(
+      name: _nameController.text,
+      description: _descriptionController.text,
+      tags: _tagsController.text.split(','),
+      isPublic: _isPublic,
+      imageFile: _selectedImage, // The controller converts this file to Base64.
+    );
 
-      // Get user details
-      final userDoc = await FirebaseFirestore.instance
-          .collection('UserDetails')
-          .doc(user.uid)
-          .get();
-
-      if (!userDoc.exists) {
-        Get.snackbar('Error', 'User profile not found');
-        return;
-      }
-
-      final userData = userDoc.data() as Map<String, dynamic>;
-
-      // Create the community
-      final communityRef =
-          await FirebaseFirestore.instance.collection('communities').add({
-        'name': _nameController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'tags': _tagsController.text
-            .split(',')
-            .map((e) => e.trim().toLowerCase())
-            .toList(),
-        'isPublic': _isPublic,
-        'createdBy': user.uid,
-        'createdAt': FieldValue.serverTimestamp(),
-        'memberCount': 1,
-        'creatorLocation': '${userData['city']}, ${userData['state']}',
-        'creatorEmail': userData['email'],
-      });
-
-      // Add creator as admin in members subcollection
-      await communityRef.collection('members').doc(user.uid).set({
-        'userId': user.uid,
-        'role': 'admin',
-        'joinedAt': FieldValue.serverTimestamp(),
-        'email': userData['email'],
-        'location': '${userData['city']}, ${userData['state']}',
-      });
-
-      Get.back();
-      Get.snackbar('Success', 'Community created successfully');
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to create community: $e');
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -101,6 +76,25 @@ class _CommunityCreatePageState extends State<CommunityCreatePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Display selected image preview
+                    if (_selectedImage != null)
+                      Container(
+                        height: 200,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(_selectedImage!),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.image),
+                      label: const Text('Select Community Image'),
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _nameController,
                       decoration: const InputDecoration(

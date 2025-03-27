@@ -49,6 +49,7 @@ dependencies:
   latlong2: ^0.9.0
   image_picker: ^1.1.2
   weather: ^3.1.1
+  firebase_storage: ^12.4.4
 
 dev_dependencies:
   flutter_test:
