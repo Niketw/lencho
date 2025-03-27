@@ -21,9 +21,10 @@ class JobsSection extends StatelessWidget {
         }
         if (!snapshot.hasData) {
           return const Center(
-              child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5A27)),
-          ));
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5A27)),
+            ),
+          );
         }
         final jobs = snapshot.data!;
         if (jobs.isEmpty) {
@@ -97,7 +98,7 @@ class _ExpandableJobCardState extends State<ExpandableJobCard> {
           end: Alignment.bottomRight,
           colors: [
             Color(0xFFFFFFFF),
-            Color(0xFFE8F4FF),
+            Color(0xFFFFF4BE),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
@@ -118,7 +119,7 @@ class _ExpandableJobCardState extends State<ExpandableJobCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Job header
+            // Job header styled similarly to campaign header.
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
@@ -169,8 +170,7 @@ class _ExpandableJobCardState extends State<ExpandableJobCard> {
                 ],
               ),
             ),
-
-            // Job content
+            // Job content styled similar to campaign content.
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(

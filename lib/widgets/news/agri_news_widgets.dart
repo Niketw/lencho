@@ -80,7 +80,7 @@ class ExpandableNewsCard extends StatefulWidget {
 class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
   bool isExpanded = false;
   final double collapsedHeight = 165.0;
-  final double expandedHeight = 300.0; // Set a reasonable expanded height
+  final double expandedHeight = 300.0; // Reasonable expanded height
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +93,7 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
           end: Alignment.bottomRight,
           colors: [
             Color(0xFFFFFFFF),
-            Color(0xFFACE268),
+            Color(0xFFFFF4BE),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
@@ -114,11 +114,11 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // News header
+            // News header (matches campaign header style)
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
-                color: Color(0xFFFFF4BE),
+                color: Color(0xFFACE268),
                 border: Border(
                   bottom: BorderSide(
                     color: Color(0xFF2D5A27),
@@ -129,10 +129,17 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(
-                    Icons.article_outlined,
-                    color: Color(0xFF2D5A27),
-                    size: 20,
+                  Expanded(
+                    child: Text(
+                      widget.newsItem['title'] ?? 'No Title',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D5A27),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -158,8 +165,7 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
                 ],
               ),
             ),
-
-            // News content
+            // News content area
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -168,24 +174,11 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.newsItem['title'] ?? 'No Title',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D5A27),
-                        ),
-                        maxLines: isExpanded ? null : 2,
-                        overflow: isExpanded
-                            ? TextOverflow.visible
-                            : TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
                         widget.newsItem['description'] ??
                             'No description available',
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: Color(0xFF2D5A27),
                         ),
                         maxLines: isExpanded ? null : 4,
                         overflow: isExpanded
@@ -195,22 +188,23 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
                       if (isExpanded && widget.newsItem['url'] != null) ...[
                         const SizedBox(height: 16),
                         Align(
-                          alignment: Alignment.bottomRight,
-                          child: TextButton.icon(
-                            icon: const Icon(
-                              Icons.open_in_new,
-                              size: 16,
-                              color: Color(0xFF2D5A27),
-                            ),
-                            label: const Text(
-                              'Read More',
-                              style: TextStyle(
-                                color: Color(0xFF2D5A27),
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Open URL logic goes here.
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF2D5A27),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
                               ),
                             ),
-                            onPressed: () {
-                              // Open URL
-                            },
+                            child: const Text('Read More'),
                           ),
                         ),
                       ],
@@ -225,4 +219,3 @@ class _ExpandableNewsCardState extends State<ExpandableNewsCard> {
     );
   }
 }
-
