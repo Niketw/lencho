@@ -8,10 +8,13 @@ class BushCloudRotated extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: math.pi, // 180 degrees
+      // Rotate 180 degrees.
+      angle: math.pi,
+      // Set the alignment to topCenter so the rotation is anchored at the top.
+      alignment: Alignment.topCenter,
       child: CustomPaint(
-        painter: BushCloudPainter(heightShift: -0.4),
-        child: Container(),
+        painter: BushCloudPainter(heightShift: -0.45),
+        child: Container(), // The Container takes the size from the parent.
       ),
     );
   }
