@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: const [
-          HomeHeader(), // fixed height header
+          HomeHeader(isHome: true), // fixed height header
           Expanded(       // HomeContent scrolls within the remaining space
             child: HomeContent(),
           ),

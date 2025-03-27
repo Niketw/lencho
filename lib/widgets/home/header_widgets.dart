@@ -5,7 +5,9 @@ import 'package:lencho/widgets/irrigation/location_widget.dart';
 import 'package:lencho/widgets/BushCloudRotated.dart';
 
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({Key? key}) : super(key: key);
+  final bool isHome;
+
+  const HomeHeader({Key? key, this.isHome = true}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
@@ -20,24 +22,29 @@ class HomeHeader extends StatelessWidget {
       child: Stack(
         children: [
           // Slim Ace268 rectangle at the very top.
-          Positioned(
+          const Positioned(
             top: 0,
             left: 0,
             right: 0,
             height: 60,
-            child: Container(
-              color: const Color(0xFFACE268),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Color(0xFFACE268),
+              ),
             ),
           ),
           // Fixed BushCloudRotated header.
-          Positioned(
+          const Positioned(
             top: 60, // Start right below the slim rectangle.
             left: 0,
             right: 0,
             height: 70,
-            child: const BushCloudRotated(),
+            child: SizedBox(
+              width: double.infinity,
+              child: BushCloudRotated(),
+            ),
           ),
-          // Header controls (location icon, logo/title, language toggle) on top of the bush cloud.
+          // Header controls (location/back button, logo/title, language toggle) on top of the bush cloud.
           Positioned(
             top: 20, // Align with the bush cloud top.
             left: 0,
@@ -48,17 +55,28 @@ class HomeHeader extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Location icon.
-                    InkWell(
-                      onTap: () {
-                        Get.to(() => const LocationPickerScreen());
-                      },
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Color(0xFF2D5A27),
-                        size: 32,
-                      ),
-                    ),
+                    // Show either the location icon (if isHome) or a back button.
+                    isHome
+                        ? InkWell(
+                            onTap: () {
+                              Get.to(() => const LocationPickerScreen());
+                            },
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Color(0xFF2D5A27),
+                              size: 32,
+                            ),
+                          )
+                        : InkWell(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Color(0xFF2D5A27),
+                              size: 32,
+                            ),
+                          ),
                     // Logo and title.
                     Row(
                       children: [
