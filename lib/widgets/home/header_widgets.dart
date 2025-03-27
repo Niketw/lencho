@@ -24,17 +24,17 @@ class HomeHeader extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: 20,
+            height: 60,
             child: Container(
               color: const Color(0xFFACE268),
             ),
           ),
           // Fixed BushCloudRotated header.
           Positioned(
-            top: 20, // Start right below the slim rectangle.
+            top: 60, // Start right below the slim rectangle.
             left: 0,
             right: 0,
-            height: 120,
+            height: 70,
             child: const BushCloudRotated(),
           ),
           // Header controls (location icon, logo/title, language toggle) on top of the bush cloud.
