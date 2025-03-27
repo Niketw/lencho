@@ -5,6 +5,7 @@ import 'package:lencho/controllers/home/authUser_controller.dart';
 import 'package:lencho/widgets/home/header_widgets.dart';
 import 'package:lencho/widgets/home/content_widgets.dart';
 import 'package:lencho/widgets/home/footer_widgets.dart';
+import 'package:lencho/widgets/home/background_widget.dart'; // Adjust the path
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -15,16 +16,19 @@ class HomePage extends StatelessWidget {
     final email = user?.email ?? "Guest";
     final AuthUserController authController = Get.put(AuthUserController());
     
-    return Scaffold(
-      body: Column(
-        children: const [
-          HomeHeader(isHome: true), // fixed height header
-          Expanded(       // HomeContent scrolls within the remaining space
-            child: HomeContent(),
-          ),
-        ],
+    return BackgroundGradient(
+      child: Scaffold(
+        backgroundColor: Colors.transparent, // Make the scaffold background transparent.
+        body: Column(
+          children: const [
+            HomeHeader(isHome: true), // Fixed header
+            Expanded(       // HomeContent scrolls within the remaining space
+              child: HomeContent(),
+            ),
+          ],
+        ),
+        bottomNavigationBar: const FooterNavigationBar(),
       ),
-      bottomNavigationBar: const FooterNavigationBar(),
     );
   }
 }
