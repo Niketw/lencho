@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:lencho/controllers/chat/chat_controller.dart';
-import 'package:lencho/widgets/chat/chat_page.dart';
+import 'package:lencho/screens/chat/chat_page.dart';
 
 class UserSearchPage extends StatefulWidget {
   const UserSearchPage({Key? key}) : super(key: key);

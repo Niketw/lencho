@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lencho/controllers/home/authUser_controller.dart';
 import 'package:lencho/controllers/home/logout_controller.dart';
-import 'package:lencho/widgets/chat/chat_list_page.dart';
+import 'package:lencho/screens/chat/chat_list_page.dart';
 import 'package:lencho/widgets/community/community_browse_page.dart';
 import 'package:lencho/widgets/campaign/posting_widget.dart';
 
@@ -36,8 +36,8 @@ class FooterNavigationBar extends StatelessWidget {
             label: 'Chat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: Icon(Icons.logout),
+            label: 'Logout',
           ),
         ];
       } else {
@@ -55,8 +55,8 @@ class FooterNavigationBar extends StatelessWidget {
             label: 'Chat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: Icon(Icons.logout),
+            label: 'Logout',
           ),
         ];
       }
@@ -89,7 +89,7 @@ class FooterNavigationBar extends StatelessWidget {
           onTap: (index) {
             if (isAuth) {
               if (index == 0) {
-                // Do nothing, already on home
+                // Home: do nothing or navigate accordingly.
               } else if (index == 1) {
                 Get.to(() => PostingWidget());
               } else if (index == 2) {
@@ -97,90 +97,24 @@ class FooterNavigationBar extends StatelessWidget {
               } else if (index == 3) {
                 Get.to(() => const ChatListPage());
               } else if (index == 4) {
-                // Profile or logout
-                _showProfileOptions(context);
+                // Directly logout.
+                LogoutController.instance.logout();
               }
             } else {
               if (index == 0) {
-                // Do nothing, already on home
+                // Home: do nothing.
               } else if (index == 1) {
                 Get.to(() => const CommunityBrowsePage());
               } else if (index == 2) {
                 Get.to(() => const ChatListPage());
               } else if (index == 3) {
-                // Profile or logout
-                _showProfileOptions(context);
+                // Directly logout.
+                LogoutController.instance.logout();
               }
             }
           },
         ),
       );
     });
-  }
-
-  void _showProfileOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFFF4BE),
-              Color(0xFFACE268),
-            ],
-          ),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Color(0xFF2D5A27),
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-                title: const Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D5A27),
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to profile page
-                },
-              ),
-              const Divider(color: Color(0xFF2D5A27)),
-              ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Color(0xFF2D5A27),
-                  child: Icon(Icons.logout, color: Colors.white),
-                ),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D5A27),
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  LogoutController.instance.logout();
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

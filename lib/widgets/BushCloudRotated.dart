@@ -8,9 +8,9 @@ class BushCloudRotated extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: math.pi, // 90 degrees
+      angle: math.pi, // 180 degrees
       child: CustomPaint(
-        painter: BushCloudPainter(heightShift: 0),
+        painter: BushCloudPainter(heightShift: -0.4),
         child: Container(),
       ),
     );

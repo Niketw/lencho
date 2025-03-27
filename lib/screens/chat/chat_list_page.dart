@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lencho/widgets/chat/chat_page.dart';
-import 'package:lencho/widgets/chat/user_search_page.dart';
+import 'package:lencho/screens/chat/chat_page.dart';
+import 'package:lencho/screens/chat/user_search_page.dart';
 
 class ChatListPage extends StatelessWidget {
   const ChatListPage({Key? key}) : super(key: key);
