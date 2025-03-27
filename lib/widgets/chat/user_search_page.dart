@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:lencho/models/UserDetails.dart';
-import 'package:lencho/screens/chat/chat_page.dart';
+import 'package:lencho/controllers/chat/chat_controller.dart';
+import 'package:lencho/widgets/chat/chat_page.dart';
 
 class UserSearchPage extends StatefulWidget {
   const UserSearchPage({Key? key}) : super(key: key);
@@ -20,6 +20,8 @@ class _UserSearchPageState extends State<UserSearchPage> {
   String _searchQuery = '';
   List<QueryDocumentSnapshot> _searchResults = [];
   bool _isLoading = false;
+
+  final ChatController chatController = Get.put(ChatController());
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +69,6 @@ class _UserSearchPageState extends State<UserSearchPage> {
               },
             ),
           ),
-
           // Search results
           Expanded(
             child: _isLoading
@@ -82,8 +83,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
                         itemCount: _searchResults.length,
                         itemBuilder: (context, index) {
                           final userDoc = _searchResults[index];
-                          final userData =
-                              userDoc.data() as Map<String, dynamic>;
+                          final userData = userDoc.data() as Map<String, dynamic>;
                           final userEmail = userData['email'] ?? 'No email';
 
                           return ListTile(
@@ -94,7 +94,17 @@ class _UserSearchPageState extends State<UserSearchPage> {
                             ),
                             title: Text(userEmail),
                             subtitle: Text(userData['city'] ?? ''),
-                            onTap: () => _startChat(userDoc.id),
+                            onTap: () async {
+                              // Start a chat with this user.
+                              final otherUserId = userDoc.id;
+                              final otherUserEmail = userEmail;
+                              final chatId = await chatController.startChat(
+                                  otherUserId, otherUserEmail);
+                              Get.to(() => ChatPage(
+                                    chatId: chatId,
+                                    otherUserId: otherUserId,
+                                  ));
+                            },
                           );
                         },
                       ),
@@ -118,7 +128,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
           .where('email', isLessThanOrEqualTo: query + '\uf8ff')
           .get();
 
-      // Filter out the current user
+      // Filter out the current user.
       final filteredResults =
           results.docs.where((doc) => doc.id != currentUser!.uid).toList();
 
@@ -131,47 +141,6 @@ class _UserSearchPageState extends State<UserSearchPage> {
         _isLoading = false;
       });
       Get.snackbar('Error', 'Failed to search: $e');
-    }
-  }
-
-  void _startChat(String otherUserId) async {
-    if (currentUser == null) return;
-
-    try {
-      // Check if a chat already exists between these users
-      final chatQuery = await _firestore
-          .collection('chats')
-          .where('participants', arrayContains: currentUser!.uid)
-          .get();
-
-      String chatId = '';
-
-      // Look for existing chat with the selected user
-      for (final doc in chatQuery.docs) {
-        final participants = List<String>.from(doc['participants']);
-        if (participants.contains(otherUserId)) {
-          chatId = doc.id;
-          break;
-        }
-      }
-
-      // If no chat exists, create one
-      if (chatId.isEmpty) {
-        final newChatRef = _firestore.collection('chats').doc();
-        await newChatRef.set({
-          'participants': [currentUser!.uid, otherUserId],
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        chatId = newChatRef.id;
-      }
-
-      // Navigate to the chat page
-      Get.to(() => ChatPage(
-            chatId: chatId,
-            otherUserId: otherUserId,
-          ));
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to start chat: $e');
     }
   }
 }

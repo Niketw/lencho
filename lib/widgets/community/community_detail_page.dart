@@ -303,7 +303,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       Text('${postData['comments'] ?? 0}'),
                       IconButton(
                         icon: const Icon(Icons.thumb_up),
-                        onPressed: () => _postController.likePost(widget.communityId, post.id),
+                        onPressed: () => _postController.toggleLike(widget.communityId, post.id),
                       ),
                       Text('${postData['likes'] ?? 0}'),
                     ],

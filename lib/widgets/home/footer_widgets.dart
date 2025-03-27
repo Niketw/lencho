@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lencho/controllers/home/authUser_controller.dart';
 import 'package:lencho/controllers/home/logout_controller.dart';
-import 'package:lencho/screens/chat/chat_list_page.dart';
+import 'package:lencho/widgets/chat/chat_list_page.dart';
 import 'package:lencho/widgets/community/community_browse_page.dart';
 import 'package:lencho/widgets/campaign/posting_widget.dart';
 

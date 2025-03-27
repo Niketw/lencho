@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lencho/models/UserDetails.dart';
+import 'package:get/get.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatId;
@@ -88,7 +88,6 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
-
           // Input field
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -106,7 +105,6 @@ class _ChatPageState extends State<ChatPage> {
                     maxLines: 5,
                   ),
                 ),
-
                 // Send button
                 IconButton(
                   icon: const Icon(Icons.send),
@@ -126,7 +124,7 @@ class _ChatPageState extends State<ChatPage> {
     final message = _messageController.text.trim();
     _messageController.clear();
 
-    // Add message to the subcollection
+    // Add message to the subcollection.
     await _firestore
         .collection('chats')
         .doc(widget.chatId)
@@ -137,11 +135,10 @@ class _ChatPageState extends State<ChatPage> {
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    // Update the chat document with the last message
+    // Update the chat document with the last message.
     await _firestore.collection('chats').doc(widget.chatId).set({
       'lastMessage': message,
       'lastMessageTime': FieldValue.serverTimestamp(),
-      'participants': [currentUser!.uid, widget.otherUserId],
     }, SetOptions(merge: true));
   }
 
@@ -151,7 +148,8 @@ class _ChatPageState extends State<ChatPage> {
     required Timestamp timestamp,
   }) {
     final time = timestamp.toDate();
-    final timeString = '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+    final timeString =
+        '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -170,8 +168,8 @@ class _ChatPageState extends State<ChatPage> {
           ],
           Flexible(
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0, vertical: 10.0),
               decoration: BoxDecoration(
                 color: isMe ? Colors.green.shade200 : Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(20),
