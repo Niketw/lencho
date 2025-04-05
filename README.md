@@ -1,4 +1,4 @@
-# ![Lencho Logo](assets/logo.png)  
+# ![Lencho Logo](assets/images/logo.png)  
 # 🚜 Lencho – Smart Farming Companion  
 **Version:** `v1.0.0-beta`
 
