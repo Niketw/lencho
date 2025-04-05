@@ -20,7 +20,6 @@ class CommunityBrowsePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Remove the default AppBar.
       backgroundColor: const Color.fromRGBO(245, 247, 255, 1),
       body: Column(
         children: [
@@ -169,7 +168,6 @@ class CommunityBrowsePage extends StatelessWidget {
                             ),
                             child: CircleAvatar(
                               backgroundColor: Colors.white,
-                              // Use imageContent (Base64 encoded) if available.
                               backgroundImage: data['imageContent'] != null
                                   ? MemoryImage(
                                       base64Decode(data['imageContent']),
@@ -220,6 +218,11 @@ class CommunityBrowsePage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFFACE268),
+        onPressed: () => Get.to(() => const CommunityCreatePage()),
+        child: const Icon(Icons.add),
       ),
     );
   }
