@@ -7,7 +7,6 @@ import 'firebase_options.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'controllers/home/logout_controller.dart';
 import 'widgets/auth_wrapper.dart';
-// kommit
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
