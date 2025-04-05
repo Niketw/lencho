@@ -16,7 +16,7 @@ class _DiseaseDetectionWidgetState extends State<DiseaseDetectionWidget> {
 
   // List of plant types. Update these values as needed.
   final List<String> plantTypes = [
-    'Mango'
+    'Mango', 'Cassava'
   ];
 
   String? _selectedPlant;
