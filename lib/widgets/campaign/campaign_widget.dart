@@ -23,9 +23,10 @@ class CampaignsSection extends StatelessWidget {
           }
           if (!snapshot.hasData) {
             return const Center(
-                child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5A27)),
-            ));
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5A27)),
+              ),
+            );
           }
           final campaigns = snapshot.data!;
           if (campaigns.isEmpty) {
@@ -37,17 +38,43 @@ class CampaignsSection extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Section title
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12.0),
-                child: Text(
-                  'CAMPAIGNS',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D5A27),
-                    letterSpacing: 1.2,
-                  ),
+              // Section title with updated info icon pop-up
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'CAMPAIGNS',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D5A27),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Campaign Posting Information"),
+                            content: const Text("Please contact lencho.iiita@gmail.com to post new campaigns"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.info_outline,
+                        color: Color(0xFF2D5A27),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // Horizontal list of expandable campaign cards with fixed height
@@ -170,7 +197,6 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
                 ],
               ),
             ),
-
             // Campaign content
             Expanded(
               child: SingleChildScrollView(
@@ -267,4 +293,3 @@ class _ExpandableCampaignCardState extends State<ExpandableCampaignCard> {
     );
   }
 }
-

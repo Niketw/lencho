@@ -58,13 +58,10 @@ class CommunityPostController extends GetxController {
     }
   }
 
-  /// Toggle the like status for a post. If the user has already liked the post,
-  /// clicking again removes the like; otherwise, it adds a like.
   Future<void> toggleLike(String communityId, String postId) async {
     final user = _auth.currentUser;
     if (user == null) return;
     
-    // Reference to the user's like document in the "likes" subcollection.
     final likeDocRef = _firestore
         .collection('communities')
         .doc(communityId)
@@ -73,38 +70,55 @@ class CommunityPostController extends GetxController {
         .collection('likes')
         .doc(user.uid);
     
-    // Reference to the post document.
     final postDocRef = _firestore
         .collection('communities')
         .doc(communityId)
         .collection('posts')
         .doc(postId);
     
-    // Check if the user already liked the post.
-    final likeDoc = await likeDocRef.get();
-    
-    if (likeDoc.exists) {
-      // User already liked the post, so remove the like.
-      await _firestore.runTransaction((transaction) async {
-        transaction.delete(likeDocRef);
-        final postSnapshot = await transaction.get(postDocRef);
-        final currentLikes = (postSnapshot.data()?['likes'] ?? 0) as int;
-        // Ensure likes do not go below 0.
-        transaction.update(postDocRef, {'likes': currentLikes > 0 ? currentLikes - 1 : 0});
-      });
-    } else {
-      // User has not liked the post yet, so add the like.
-      await _firestore.runTransaction((transaction) async {
-        transaction.set(likeDocRef, {
-          'userId': user.uid,
-          'likedAt': FieldValue.serverTimestamp(),
+    try {
+      final likeDoc = await likeDocRef.get();
+      
+      if (likeDoc.exists) {
+        // User already liked the post: remove the like.
+        print('User already liked the post. Removing like...');
+        
+        await _firestore.runTransaction((transaction) async {
+          // Do all reads first.
+          final postSnapshot = await transaction.get(postDocRef);
+          final currentLikes = (postSnapshot.data()?['likes'] ?? 0) as int;
+          
+          // Now perform the writes.
+          transaction.delete(likeDocRef);
+          transaction.update(postDocRef, {
+            'likes': currentLikes > 0 ? currentLikes - 1 : 0,
+          });
         });
-        final postSnapshot = await transaction.get(postDocRef);
-        final currentLikes = (postSnapshot.data()?['likes'] ?? 0) as int;
-        transaction.update(postDocRef, {'likes': currentLikes + 1});
-      });
+        print('Like removed successfully.');
+      } else {
+        // User has not liked the post: add the like.
+        print('User has not liked the post. Adding like...');
+        
+        await _firestore.runTransaction((transaction) async {
+          // Do the read first.
+          final postSnapshot = await transaction.get(postDocRef);
+          final currentLikes = (postSnapshot.data()?['likes'] ?? 0) as int;
+          
+          // Then perform the writes.
+          transaction.set(likeDocRef, {
+            'userId': user.uid,
+            'likedAt': FieldValue.serverTimestamp(),
+          });
+          transaction.update(postDocRef, {'likes': currentLikes + 1});
+        });
+        print('Like added successfully.');
+      }
+    } catch (e) {
+      print('Error in toggleLike: $e');
+      Get.snackbar('Error', 'Failed to toggle like: $e');
     }
   }
+
 
   /// Add a comment to a post and update the comment count.
   Future<void> commentPost({
