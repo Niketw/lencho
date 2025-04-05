@@ -25,8 +25,55 @@ class ChatListPage extends StatelessWidget {
             )
           : Column(
               children: [
-                // Replace the current header with the HomeHeader widget.
+                // Custom header.
                 const HomeHeader(isHome: false),
+                // Permanent search bar for users.
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                  child: InkWell(
+                    onTap: () {
+                      // Navigate to the user search page.
+                      Get.to(() => const UserSearchPage());
+                    },
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF2D5A27).withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: const Color(0xFFACE268).withOpacity(0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(
+                            Icons.search,
+                            color: Color(0xFF2D5A27),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Search users...',
+                            style: TextStyle(
+                              color: Color(0xFF2D5A27),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Chat list.
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -36,10 +83,13 @@ class ChatListPage extends StatelessWidget {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
                       }
 
-                      final chatDocs = snapshot.hasData ? snapshot.data!.docs : [];
+                      final chatDocs =
+                          snapshot.hasData ? snapshot.data!.docs : [];
                       if (chatDocs.isEmpty) {
                         return Center(
                           child: Column(
@@ -53,7 +103,8 @@ class ChatListPage extends StatelessWidget {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFACE268),
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
                                   ),
@@ -83,29 +134,35 @@ class ChatListPage extends StatelessWidget {
                         itemCount: chatDocs.length,
                         itemBuilder: (context, index) {
                           final chatDoc = chatDocs[index];
-                          final chatData = chatDoc.data() as Map<String, dynamic>;
+                          final chatData =
+                              chatDoc.data() as Map<String, dynamic>;
 
                           // Retrieve participant emails.
                           final List<dynamic> emailsDynamic =
                               chatData['participantsEmails'] ?? [];
-                          final List<String> emails =
-                              emailsDynamic.map((e) => e.toString()).toList();
+                          final List<String> emails = emailsDynamic
+                              .map((e) => e.toString())
+                              .toList();
 
                           // Retrieve the user IDs.
-                          final participants = List<String>.from(chatData['participants']);
+                          final participants =
+                              List<String>.from(chatData['participants']);
                           final otherUserId = participants.firstWhere(
                             (id) => id != currentUser.uid,
                             orElse: () => 'Unknown',
                           );
 
                           // Retrieve the other user's email.
-                          final otherEmails =
-                              emails.where((email) => email != currentEmail).toList();
-                          final otherUserEmail =
-                              otherEmails.isNotEmpty ? otherEmails.first : 'Unknown';
+                          final otherEmails = emails
+                              .where((email) => email != currentEmail)
+                              .toList();
+                          final otherUserEmail = otherEmails.isNotEmpty
+                              ? otherEmails.first
+                              : 'Unknown';
 
                           return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             leading: Container(
                               padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
@@ -136,15 +193,17 @@ class ChatListPage extends StatelessWidget {
                               ),
                             ),
                             subtitle: Text(
-                              chatData['lastMessage'] ?? 'Start a conversation',
+                              chatData['lastMessage'] ??
+                                  'Start a conversation',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Color(0xFF2D5A27)),
+                              style:
+                                  const TextStyle(color: Color(0xFF2D5A27)),
                             ),
                             trailing: chatData['lastMessageTime'] != null
                                 ? Text(
-                                    _formatTimestamp(
-                                        chatData['lastMessageTime'] as Timestamp),
+                                    _formatTimestamp(chatData['lastMessageTime']
+                                        as Timestamp),
                                     style: const TextStyle(
                                       color: Colors.grey,
                                       fontSize: 12,

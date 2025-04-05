@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lencho/controllers/home/user_location.dart';
 import 'package:lencho/screens/home/home_page.dart';
 
@@ -14,13 +15,34 @@ class LocationPickerScreen extends StatefulWidget {
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   late final MapController _mapController;
-  LatLng _pickedLocation = LatLng(37.7749, -122.4194);
+  // Fallback coordinates.
+  LatLng _pickedLocation = LatLng(25.4381, 81.8338);
   final UserLocationController userLocationController = Get.put(UserLocationController());
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
+    _initializeLocation();
+  }
+
+  Future<void> _initializeLocation() async {
+    // Get the current user from Firebase Auth.
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      // Fetch user location details from your controller.
+      final userLocation = await userLocationController.getUserLocation();
+      if (userLocation != null &&
+          userLocation.latitude != null &&
+          userLocation.longitude != null) {
+        setState(() {
+          _pickedLocation = LatLng(userLocation.latitude, userLocation.longitude);
+        });
+        _mapController.move(_pickedLocation, 12.0);
+        return;
+      }
+    }
+    // If no user location details, _pickedLocation remains as fallback.
   }
 
   void _onMapTap(TapPosition tapPosition, LatLng latlng) {
@@ -55,8 +77,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 subdomains: const ['a', 'b', 'c'],
               ),
               MarkerLayer(

@@ -3,6 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:lencho/controllers/irrigation/weather_controller.dart';
 
+class UserLocation {
+  final double latitude;
+  final double longitude;
+  
+  UserLocation({required this.latitude, required this.longitude});
+}
+
 class UserLocationController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -56,5 +63,32 @@ class UserLocationController extends GetxController {
       print("Error updating location for user ${user.uid}: $e");
       Get.snackbar('Error', 'Failed to update location: $e');
     }
+  }
+
+  /// Fetches the user's location (latitude and longitude) from Firestore.
+  /// Returns a [UserLocation] object if found, otherwise returns null.
+  Future<UserLocation?> getUserLocation() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+
+    try {
+      final querySnapshot = await _db
+          .collection('UserDetails')
+          .where('email', isEqualTo: user.email?.trim())
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final data = querySnapshot.docs.first.data();
+        if (data.containsKey('latitude') && data.containsKey('longitude')) {
+          final latitude = (data['latitude'] as num).toDouble();
+          final longitude = (data['longitude'] as num).toDouble();
+          return UserLocation(latitude: latitude, longitude: longitude);
+        }
+      }
+    } catch (e) {
+      print("Error fetching user location: $e");
+      Get.snackbar('Error', 'Failed to fetch user location: $e');
+    }
+    return null;
   }
 }
