@@ -1,5 +1,6 @@
 # ![Lencho Logo](assets/images/logo_display.png)  
 # 🚜 Lencho – Smart Farming Companion  
+### *For every Lencho out there* 🌾  
 **Version:** `v1.0.0-beta`
 
 Lencho is a modern farming assistant app built for farmers and agricultural enthusiasts. Whether you're managing crops, checking the weather, or staying updated with the latest agricultural trends, Lencho is here to support your journey. 🌾
