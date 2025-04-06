@@ -47,21 +47,20 @@ class ChatController extends GetxController {
     final currentUser = _auth.currentUser;
     if (currentUser == null || messageText.trim().isEmpty) return;
 
-    // Add message document to the 'messages' subcollection.
-    await _firestore
-        .collection('chats')
-        .doc(chatId)
-        .collection('messages')
-        .add({
+    final now = DateTime.now();
+    // Add message with both server and local timestamps.
+    await _firestore.collection('chats').doc(chatId).collection('messages').add({
       'text': messageText,
       'senderId': currentUser.uid,
       'timestamp': FieldValue.serverTimestamp(),
+      'localTimestamp': now.millisecondsSinceEpoch,
     });
 
-    // Update the chat document with the latest message details.
+    // Update chat document with latest message.
     await _firestore.collection('chats').doc(chatId).set({
       'lastMessage': messageText,
       'lastMessageTime': FieldValue.serverTimestamp(),
+      'localLastMessageTime': now.millisecondsSinceEpoch,
     }, SetOptions(merge: true));
   }
 }
